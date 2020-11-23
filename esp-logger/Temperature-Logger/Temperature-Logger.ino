@@ -1,3 +1,4 @@
+#include <ArduinoUniqueID.h>
 #include <DHTesp.h>
 
 /**
@@ -27,6 +28,8 @@ DHTesp dht;
 TaskHandle_t tempTaskHandle = NULL;
 /** Pin number for DHT11 data pin */
 int dhtPin = 4;
+
+String uniqueId; // A cache for the unique ID
 
 /*
 const char* ca = \ 
@@ -76,6 +79,12 @@ void setup() {
         delay(1000);
     }
 
+    for (size_t i = 0; i < UniqueIDsize; i++)
+    {
+        uniqueId += String(UniqueID[i], HEX);
+    }
+    
+
     wifiMulti.addAP(ssid, password);
 
 }
@@ -99,11 +108,12 @@ void loop() {
         //http.begin("192.168.0.11/a/check", ca); //HTTPS
         http.begin("192.168.0.11", 5000, "/"); //HTTP
 
-        USE_SERIAL.print("[HTTP] GET...\n");
+        USE_SERIAL.print("[HTTP] POST...\n");
         // start connection and send HTTP header
 
-        String payload = String("{\"temp\":") + String(lastValues.temperature) +
-                         String(", \"humidity\":") + String(lastValues.humidity) + 
+        String payload = String("{\"temp\": ")      + String(lastValues.temperature) +
+                         String(", \"humidity\": ") + String(lastValues.humidity) + 
+                         String(", \"device\": \"") + uniqueId + String("\"") +
                          String("}");
 
         USE_SERIAL.print("Sending JSON: ");
@@ -114,7 +124,7 @@ void loop() {
         // httpCode will be negative on error
         if(httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
-            USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
+            USE_SERIAL.printf("[HTTP] POST... code: %d\n", httpCode);
 
             // file found at server
             if(httpCode == HTTP_CODE_OK) {
