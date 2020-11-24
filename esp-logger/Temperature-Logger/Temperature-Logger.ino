@@ -1,6 +1,3 @@
-#include <ArduinoUniqueID.h>
-#include <DHTesp.h>
-
 /**
  * BasicHTTPClient.ino
  *
@@ -10,10 +7,14 @@
 
 #include <Arduino.h>
 
+#include <ArduinoUniqueID.h>
+#include <DHTesp.h>
+
 #include <WiFi.h>
 #include <WiFiMulti.h>
 
 #include <HTTPClient.h>
+#include <ESPmDNS.h>
 
 #define USE_SERIAL Serial
 
@@ -87,11 +88,22 @@ void setup() {
 
     wifiMulti.addAP(ssid, password);
 
+    while(!wifiMulti.run() == WL_CONNECTED)
+    {
+        delay(1000);
+    }
+
+    if (!MDNS.begin("ESP32_Browser")) {
+        Serial.println("Error setting up MDNS responder!");
+        while(1){
+            delay(1000);
+        }
+    }
 }
 
 void loop() {
     // wait for WiFi connection
-    if((wifiMulti.run() == WL_CONNECTED)) {
+    if(wifiMulti.run() == WL_CONNECTED) {
 
         // Reading temperature and humidity takes about 250 milliseconds!
         // Sensor readings may also be up to 2 seconds 'old' (it's a very slow sensor)
@@ -99,44 +111,86 @@ void loop() {
 
         USE_SERIAL.println("Temperature: " + String(lastValues.temperature,0));
         USE_SERIAL.println("Humidity: " + String(lastValues.humidity,0));
-      
 
-        HTTPClient http;
+        IPAddress serviceIp;
+        uint16_t servicePort;
+        bool found = browseService("templog-server", "tcp", &serviceIp, &servicePort);
 
-        USE_SERIAL.print("[HTTP] begin...\n");
-        // configure traged server and url
-        //http.begin("192.168.0.11/a/check", ca); //HTTPS
-        http.begin("192.168.0.11", 5000, "/"); //HTTP
-
-        USE_SERIAL.print("[HTTP] POST...\n");
-        // start connection and send HTTP header
-
-        String payload = String("{\"temp\": ")      + String(lastValues.temperature) +
-                         String(", \"humidity\": ") + String(lastValues.humidity) + 
-                         String(", \"device\": \"") + uniqueId + String("\"") +
-                         String("}");
-
-        USE_SERIAL.print("Sending JSON: ");
-        USE_SERIAL.println(payload);
-        
-        int httpCode = http.POST(payload);
-
-        // httpCode will be negative on error
-        if(httpCode > 0) {
-            // HTTP header has been send and Server response header has been handled
-            USE_SERIAL.printf("[HTTP] POST... code: %d\n", httpCode);
-
-            // file found at server
-            if(httpCode == HTTP_CODE_OK) {
-                String payload = http.getString();
-                USE_SERIAL.println(payload);
-            }
-        } else {
-            USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        if (not found)
+        {
+            Serial.println("Could not locate service!");
         }
-
-        http.end();
+        else
+        {
+            HTTPClient http;
+    
+            USE_SERIAL.print("[HTTP] begin...\n");
+            // configure traged server and url
+            //http.begin("192.168.0.11/a/check", ca); //HTTPS
+            http.begin(serviceIp.toString(), servicePort, "/"); //HTTP
+    
+            USE_SERIAL.print("[HTTP] POST...\n");
+            // start connection and send HTTP header
+    
+            String payload = String("{\"temp\": ")      + String(lastValues.temperature) +
+                             String(", \"humidity\": ") + String(lastValues.humidity) + 
+                             String(", \"device\": \"") + uniqueId + String("\"") +
+                             String("}");
+    
+            USE_SERIAL.print("Sending JSON: ");
+            USE_SERIAL.println(payload);
+            
+            int httpCode = http.POST(payload);
+    
+            // httpCode will be negative on error
+            if(httpCode > 0) {
+                // HTTP header has been send and Server response header has been handled
+                USE_SERIAL.printf("[HTTP] POST... code: %d\n", httpCode);
+    
+                // file found at server
+                if(httpCode == HTTP_CODE_OK) {
+                    String payload = http.getString();
+                    USE_SERIAL.println(payload);
+                }
+            } else {
+                USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+            }
+    
+            http.end();
+        }
     }
 
     delay(5000);
+}
+
+bool browseService(const char * service, const char * proto, IPAddress *ip, uint16_t *port){
+    Serial.printf("Browsing for service _%s._%s.local. ... ", service, proto);
+    int n = MDNS.queryService(service, proto);
+
+    bool found;
+    if (n == 0) {
+        Serial.println("no services found");
+        found = false;
+    } else {
+        Serial.print(n);
+        Serial.println(" service(s) found, using first discovered");
+        for (int i = 0; i < n; ++i) {
+            // Print details for each service found
+            Serial.print("  ");
+            Serial.print(i + 1);
+            Serial.print(": ");
+            Serial.print(MDNS.hostname(i));
+            Serial.print(" (");
+            Serial.print(MDNS.IP(i));
+            Serial.print(":");
+            Serial.print(MDNS.port(i));
+            Serial.println(")");
+        }
+
+        found = true;
+        *ip = MDNS.IP(0);
+        *port = MDNS.port(0);
+    }
+    Serial.println();
+    return found;
 }
