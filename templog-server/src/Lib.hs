@@ -18,9 +18,9 @@ import           Data.Time
 import           Measurements
 
 data TemperatureFromESP = TemperatureFromESP {
-    tfeDevice   :: Text,
-    tfeTemp     :: Double,
-    tfeHumidity :: Double
+    device   :: Text,
+    temp     :: Double,
+    humidity :: Double
 } deriving (Generic, Show)
 
 instance FromJSON TemperatureFromESP
