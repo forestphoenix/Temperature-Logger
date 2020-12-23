@@ -28,7 +28,9 @@ DHTesp dht;
 /** Task handle for the light value read task */
 TaskHandle_t tempTaskHandle = NULL;
 /** Pin number for DHT11 data pin */
-int dhtPin = 4;
+constexpr int dhtPin = 4;
+constexpr int ledPin = 2;
+
 
 String uniqueId; // A cache for the unique ID
 
@@ -67,6 +69,8 @@ void setup() {
 
     USE_SERIAL.begin(115200);
 
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, HIGH);
     // Initialize temperature sensor
     dht.setup(dhtPin, DHTesp::DHT22);
 
@@ -99,6 +103,8 @@ void setup() {
             delay(1000);
         }
     }
+
+    digitalWrite(ledPin, LOW);
 }
 
 void loop() {
@@ -119,6 +125,8 @@ void loop() {
         if (not found)
         {
             Serial.println("Could not locate service!");
+
+            blinkLed(2);
         }
         else
         {
@@ -151,16 +159,39 @@ void loop() {
                 if(httpCode == HTTP_CODE_OK) {
                     String payload = http.getString();
                     USE_SERIAL.println(payload);
+
+                    blinkLed(1);
+                }
+                else
+                {
+                    blinkLed(4);
                 }
             } else {
                 USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+
+                blinkLed(3);
             }
     
             http.end();
         }
     }
 
-    delay(5000);
+    delay(30000);
+}
+
+void blinkLed(int times)
+{
+    for(int i = 0; i < times; i++)
+    {
+        digitalWrite(ledPin, HIGH);
+        delay(100);
+        digitalWrite(ledPin, LOW);
+
+        if(i + 1 < times)
+        {
+            delay(100);
+        }
+    }
 }
 
 bool browseService(const char * service, const char * proto, IPAddress *ip, uint16_t *port){
