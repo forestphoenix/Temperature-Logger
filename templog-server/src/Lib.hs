@@ -18,9 +18,9 @@ import           Data.Time
 import           Measurements
 
 data TemperatureFromESP = TemperatureFromESP {
-    device   :: Text,
-    temp     :: Double,
-    humidity :: Double
+    tfeDevice   :: Text,
+    tfeTemp     :: Double,
+    tfeHumidity :: Double
 } deriving (Generic, Show)
 
 instance FromJSON TemperatureFromESP
@@ -28,7 +28,9 @@ instance FromJSON TemperatureFromESP
 runServer :: IO ()
 runServer = scotty 5000 $ do
     WS.get "/" $ do
-        text "Please post temperature Data"
+        current <- liftAndCatchIO $ withConnectionIO (connectSqlite3 "db/database.db3") $ \conn ->
+            readLatestMeasurements conn
+        text $ show current
     WS.post "/" $ do
         temperatureData <- jsonData
         liftAndCatchIO $ withConnectionIO (connectSqlite3 "db/database.db3") $ \conn ->
