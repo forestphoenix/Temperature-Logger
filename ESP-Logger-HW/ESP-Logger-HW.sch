@@ -1,40 +1,5 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:switches
-LIBS:relays
-LIBS:motors
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
-LIBS:ESP32-footprints-Shem-Lib
-LIBS:Sensor
-LIBS:ESP-Logger-HW-cache
-EELAYER 25 0
+EESchema Schematic File Version 4
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -49,7 +14,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L ESP32-WROOM ESP1
+L ESP32-footprints-Shem-Lib:ESP32-WROOM ESP1
 U 1 1 5F90835A
 P 4050 3700
 F 0 "ESP1" H 3350 4950 60  0000 C CNN
@@ -60,29 +25,29 @@ F 3 "" H 3600 4150 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VCC #PWR01
+L power:VCC #PWR01
 U 1 1 5F9085DA
-P 1950 1650
-F 0 "#PWR01" H 1950 1500 50  0001 C CNN
-F 1 "VCC" H 1950 1800 50  0000 C CNN
-F 2 "" H 1950 1650 50  0001 C CNN
-F 3 "" H 1950 1650 50  0001 C CNN
-	1    1950 1650
+P 1300 1650
+F 0 "#PWR01" H 1300 1500 50  0001 C CNN
+F 1 "VCC" H 1300 1800 50  0000 C CNN
+F 2 "" H 1300 1650 50  0001 C CNN
+F 3 "" H 1300 1650 50  0001 C CNN
+	1    1300 1650
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR02
+L power:GND #PWR02
 U 1 1 5F9086C7
-P 2050 5100
-F 0 "#PWR02" H 2050 4850 50  0001 C CNN
-F 1 "GND" H 2050 4950 50  0000 C CNN
-F 2 "" H 2050 5100 50  0001 C CNN
-F 3 "" H 2050 5100 50  0001 C CNN
-	1    2050 5100
+P 1400 5100
+F 0 "#PWR02" H 1400 4850 50  0001 C CNN
+F 1 "GND" H 1400 4950 50  0000 C CNN
+F 2 "" H 1400 5100 50  0001 C CNN
+F 3 "" H 1400 5100 50  0001 C CNN
+	1    1400 5100
 	1    0    0    -1  
 $EndComp
 $Comp
-L DHT11 DHT1
+L Sensor1:DHT11 DHT1
 U 1 1 5F908EE1
 P 6000 2850
 F 0 "DHT1" H 5850 3100 50  0000 C CNN
@@ -93,7 +58,7 @@ F 3 "" H 6150 3100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R1
+L ESP-Logger-HW-rescue:R R1
 U 1 1 5F909000
 P 5450 2200
 F 0 "R1" V 5530 2200 50  0000 C CNN
@@ -104,7 +69,7 @@ F 3 "" H 5450 2200 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L LED D2
+L ESP-Logger-HW-rescue:LED D2
 U 1 1 5FBDCA79
 P 7000 3500
 F 0 "D2" H 7000 3600 50  0000 C CNN
@@ -115,7 +80,7 @@ F 3 "" H 7000 3500 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L LED D1
+L ESP-Logger-HW-rescue:LED D1
 U 1 1 5FBDCB86
 P 7000 3250
 F 0 "D1" H 7000 3350 50  0000 C CNN
@@ -126,29 +91,29 @@ F 3 "" H 7000 3250 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L C C2
+L ESP-Logger-HW-rescue:C C2
 U 1 1 5FBDCE75
-P 2450 3500
-F 0 "C2" H 2475 3600 50  0000 L CNN
-F 1 "10uF" H 2475 3400 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0603_HandSoldering" H 2488 3350 50  0001 C CNN
-F 3 "" H 2450 3500 50  0001 C CNN
-	1    2450 3500
+P 1800 3500
+F 0 "C2" H 1825 3600 50  0000 L CNN
+F 1 "10uF" H 1825 3400 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 1838 3350 50  0001 C CNN
+F 3 "" H 1800 3500 50  0001 C CNN
+	1    1800 3500
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C1
+L ESP-Logger-HW-rescue:C C1
 U 1 1 5FBDD0CA
-P 2100 3500
-F 0 "C1" H 2125 3600 50  0000 L CNN
-F 1 "0.1uF" H 2125 3400 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0603_HandSoldering" H 2138 3350 50  0001 C CNN
-F 3 "" H 2100 3500 50  0001 C CNN
-	1    2100 3500
+P 1450 3500
+F 0 "C1" H 1475 3600 50  0000 L CNN
+F 1 "0.1uF" H 1475 3400 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 1488 3350 50  0001 C CNN
+F 3 "" H 1450 3500 50  0001 C CNN
+	1    1450 3500
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D3
+L ESP-Logger-HW-rescue:LED D3
 U 1 1 5FBDD5C2
 P 7000 3750
 F 0 "D3" H 7000 3850 50  0000 C CNN
@@ -159,7 +124,7 @@ F 3 "" H 7000 3750 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L R R2
+L ESP-Logger-HW-rescue:R R2
 U 1 1 5FBDD68B
 P 7450 3250
 F 0 "R2" V 7530 3250 50  0000 C CNN
@@ -170,7 +135,7 @@ F 3 "" H 7450 3250 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L R R3
+L ESP-Logger-HW-rescue:R R3
 U 1 1 5FBDD7B4
 P 7450 3500
 F 0 "R3" V 7530 3500 50  0000 C CNN
@@ -181,7 +146,7 @@ F 3 "" H 7450 3500 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L R R4
+L ESP-Logger-HW-rescue:R R4
 U 1 1 5FBDD7F4
 P 7450 3750
 F 0 "R4" V 7530 3750 50  0000 C CNN
@@ -191,74 +156,66 @@ F 3 "" H 7450 3750 50  0001 C CNN
 	1    7450 3750
 	0    -1   -1   0   
 $EndComp
-Text Label 5050 4150 0    60   ~ 0
-BOOT
-Text Label 2800 3200 0    60   ~ 0
-FLASH
 $Comp
-L Conn_01x02_Female J2
+L ESP-Logger-HW-rescue:Conn_01x02_Female J2
 U 1 1 602C6863
-P 1150 3300
-F 0 "J2" H 1150 3400 50  0000 C CNN
-F 1 "Conn_01x02_Female" H 1150 3100 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Angled_1x02_Pitch2.54mm" H 1150 3300 50  0001 C CNN
-F 3 "" H 1150 3300 50  0001 C CNN
-	1    1150 3300
+P 500 3300
+F 0 "J2" H 500 3400 50  0000 C CNN
+F 1 "Conn_01x02_Female" H 500 3100 50  0000 C CNN
+F 2 "Connectors_JST:JST_XH_B02B-XH-A_02x2.50mm_Straight" H 500 3300 50  0001 C CNN
+F 3 "" H 500 3300 50  0001 C CNN
+	1    500  3300
 	-1   0    0    1   
 $EndComp
 $Comp
-L Conn_01x04_Male J1
+L ESP-Logger-HW-rescue:Conn_01x04_Male J1
 U 1 1 602C7008
 P 5800 1500
 F 0 "J1" H 5800 1700 50  0000 C CNN
 F 1 "Conn_01x04_Male" H 5800 1200 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Angled_1x04_Pitch2.54mm" H 5800 1500 50  0001 C CNN
+F 2 "Connectors_JST:JST_XH_B04B-XH-A_04x2.50mm_Straight" H 5800 1500 50  0001 C CNN
 F 3 "" H 5800 1500 50  0001 C CNN
 	1    5800 1500
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	1950 1650 1950 3100
+	1300 1650 1300 1900
 Wire Wire Line
-	1950 3100 3100 3100
+	1300 3100 1450 3100
 Wire Wire Line
-	2050 4400 2050 5100
+	1400 4400 1400 5000
 Wire Wire Line
-	2050 4400 3100 4400
+	1400 4400 1450 4400
 Wire Wire Line
 	6000 1900 6000 2550
 Wire Wire Line
-	1650 1900 6000 1900
-Connection ~ 1950 1900
+	1000 1900 1300 1900
+Connection ~ 1300 1900
 Wire Wire Line
 	5300 2200 5200 2200
 Wire Wire Line
-	5200 2200 5200 1900
-Connection ~ 5200 1900
-Wire Wire Line
 	5600 2200 6400 2200
 Wire Wire Line
-	6400 2200 6400 4050
+	6400 2200 6400 2850
 Wire Wire Line
 	6400 2850 6300 2850
 Wire Wire Line
 	6000 3150 6000 5000
-Connection ~ 2050 5000
 Wire Wire Line
 	6400 4050 4950 4050
 Connection ~ 6400 2850
 Wire Wire Line
-	2100 3350 2100 3100
-Connection ~ 2100 3100
+	1450 3350 1450 3100
+Connection ~ 1450 3100
 Wire Wire Line
-	2450 3350 2450 3100
-Connection ~ 2450 3100
+	1800 3350 1800 3100
+Connection ~ 1800 3100
 Wire Wire Line
-	2100 3650 2100 4400
-Connection ~ 2100 4400
+	1450 3650 1450 4400
+Connection ~ 1450 4400
 Wire Wire Line
-	2450 3650 2450 4400
-Connection ~ 2450 4400
+	1800 3650 1800 4400
+Connection ~ 1800 4400
 Wire Wire Line
 	4950 3850 5500 3850
 Wire Wire Line
@@ -286,7 +243,7 @@ Wire Wire Line
 Wire Wire Line
 	7700 3750 7600 3750
 Wire Wire Line
-	7700 3250 7700 5000
+	7700 3250 7700 3500
 Connection ~ 6000 5000
 Wire Wire Line
 	7600 3500 7700 3500
@@ -303,28 +260,21 @@ Wire Wire Line
 Wire Wire Line
 	2800 4800 2800 1300
 Wire Wire Line
-	2900 3200 3100 3200
-Wire Wire Line
-	2900 1400 2900 3200
-Connection ~ 7700 5000
-Wire Wire Line
 	4950 3250 5250 3250
 Wire Wire Line
 	4950 3150 5150 3150
 Wire Wire Line
-	1350 3300 1450 3300
+	700  3300 800  3300
 Wire Wire Line
-	1450 3300 1450 5000
+	800  3300 800  5000
 Wire Wire Line
-	1350 3200 1650 3200
+	700  3200 1000 3200
 Wire Wire Line
-	1650 3200 1650 1900
+	1000 3200 1000 1900
 Wire Wire Line
-	1450 5000 7700 5000
+	800  5000 1400 5000
 Wire Wire Line
 	2800 1300 5600 1300
-Wire Wire Line
-	2900 1400 5600 1400
 Wire Wire Line
 	5150 3150 5150 2450
 Wire Wire Line
@@ -344,6 +294,90 @@ Wire Wire Line
 Wire Wire Line
 	4950 4250 5250 4250
 Wire Wire Line
-	5250 4250 5250 5000
+	5250 4250 5250 4350
+Wire Wire Line
+	1300 1900 1300 3100
+Wire Wire Line
+	5200 1900 6000 1900
+Wire Wire Line
+	1400 5000 1400 5100
+Wire Wire Line
+	6400 2850 6400 4050
+Wire Wire Line
+	1450 3100 1800 3100
+Wire Wire Line
+	1450 4400 1800 4400
+Wire Wire Line
+	6000 5000 7700 5000
+Wire Wire Line
+	7700 3750 7700 5000
+Wire Wire Line
+	7700 3500 7700 3750
+Connection ~ 1400 5000
+Text Label 5300 4350 0    60   ~ 0
+BOOT
+Wire Wire Line
+	1400 5000 2450 5000
 Connection ~ 5250 5000
+Wire Wire Line
+	5250 5000 6000 5000
+Wire Wire Line
+	5200 2200 5200 1900
+Connection ~ 5200 1900
+Wire Wire Line
+	1800 3100 3100 3100
+Wire Wire Line
+	1800 4400 3100 4400
+Wire Wire Line
+	2350 1400 2350 3200
+Wire Wire Line
+	2350 3200 2450 3200
+Wire Wire Line
+	2350 1400 5600 1400
+$Comp
+L Device:C C3
+U 1 1 604C7A11
+P 2450 3850
+F 0 "C3" H 2565 3896 50  0000 L CNN
+F 1 "1uF" H 2565 3805 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0603_HandSoldering" H 2488 3700 50  0001 C CNN
+F 3 "~" H 2450 3850 50  0001 C CNN
+	1    2450 3850
+	1    0    0    -1  
+$EndComp
+Connection ~ 2450 3200
+Wire Wire Line
+	2450 3200 3100 3200
+Wire Wire Line
+	2450 4000 2450 5000
+Connection ~ 2450 5000
+Wire Wire Line
+	2450 5000 5250 5000
+$Comp
+L Device:R R5
+U 1 1 604CC252
+P 2450 2500
+F 0 "R5" H 2520 2546 50  0000 L CNN
+F 1 "10K" H 2520 2455 50  0000 L CNN
+F 2 "Resistors_SMD:R_0603_HandSoldering" V 2380 2500 50  0001 C CNN
+F 3 "~" H 2450 2500 50  0001 C CNN
+	1    2450 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4950 4350 5250 4350
+Connection ~ 5250 4350
+Wire Wire Line
+	5250 4350 5250 5000
+Wire Wire Line
+	2450 3700 2450 3200
+Wire Wire Line
+	1300 1900 2450 1900
+Wire Wire Line
+	2450 3200 2450 2650
+Wire Wire Line
+	2450 2350 2450 1900
+Connection ~ 2450 1900
+Wire Wire Line
+	2450 1900 5200 1900
 $EndSCHEMATC
