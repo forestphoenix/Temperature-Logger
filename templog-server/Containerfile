@@ -1,0 +1,39 @@
+FROM haskell:9.6-slim as build
+
+WORKDIR /opt/templog-server
+
+# system deps
+RUN apt-get update && \
+    apt-get install libsqlite3-dev
+
+# haskell deps
+COPY ./stack.yaml /opt/templog-server/
+COPY ./package.yaml /opt/templog-server/
+COPY ./templog-server.cabal /opt/templog-server/
+
+COPY README.md /opt/templog-server/
+COPY ChangeLog.md /opt/templog-server/
+COPY LICENSE /opt/templog-server/
+
+RUN stack build --only-dependencies
+
+# actual source code
+COPY ./src /opt/templog-server/src
+COPY ./app /opt/templog-server/app
+COPY ./db /opt/templog-server/db
+COPY ./test /opt/templog-server/test
+
+RUN stack build --test
+RUN stack install --local-bin-path /opt/bin/
+
+# === Final Image ===
+FROM alpine:3.20
+
+RUN apk add libc6-compat gmp sqlite-libs
+
+WORKDIR /opt/var/
+
+COPY --from=build /opt/templog-server/db/database.db3 /opt/var/db/database.db3
+COPY --from=build /opt/bin/ /opt/bin/
+
+CMD /opt/bin/templog-server-exe
