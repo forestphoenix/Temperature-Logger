@@ -1,0 +1,5 @@
+#pragma once
+
+#define MAX_TRANSMITTED_READINGS 40
+#define MAX_WIFI_CONNECT_ATTEMPTS 5
+#define DEEP_SLEEP_TIME_MS    60000
