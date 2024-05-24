@@ -11,7 +11,7 @@
 
 module Measurements (
     NewMeasurement(..),
-    takeMeasurement,
+    takeMeasurements,
     readLatestMeasurements,
 ) where
 
@@ -48,9 +48,10 @@ piNewMeasurement =
                    |*| #humidity
                    |*| #takenAt
 
-takeMeasurement :: (IConnection conn) => conn -> NewMeasurement -> IO ()
-takeMeasurement conn measurement = withTransaction conn $ \conn' -> do
-    runInsert conn' insertNewMeasurement measurement
+takeMeasurements :: (IConnection conn) => conn -> [NewMeasurement] -> IO ()
+takeMeasurements conn measurements = withTransaction conn $ \conn' -> do
+    forM_ measurements $ \measurement ->
+        runInsert conn' insertNewMeasurement measurement
     commit conn'
 
 data LatestMeasurements = LatestMeasurements {
