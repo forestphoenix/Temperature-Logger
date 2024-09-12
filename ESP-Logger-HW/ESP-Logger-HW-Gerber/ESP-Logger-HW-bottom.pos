@@ -1,0 +1,9 @@
+### Footprint positions - created on 2024-05-26T22:22:38+0200 ###
+### Printed by KiCad version 8.0.2
+## Unit = mm, Angle = deg.
+## Side : bottom
+# Ref     Val              Package                                        PosX       PosY       Rot  Side
+J1        Conn_01x04_Male  JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical       36.5000   -40.0000   90.0000  bottom
+J2        PWR              JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical       28.4750   -35.0000  -90.0000  bottom
+J3        USB              USB_Micro-B_Amphenol_10118194_Horizontal    22.6000   -38.1500   90.0000  bottom
+## End
