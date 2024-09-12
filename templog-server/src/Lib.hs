@@ -17,7 +17,7 @@ import           Measurements
 import qualified Types.Esp             as Esp
 
 runServer :: IO ()
-runServer = scotty 80 $ do
+runServer = scotty 8080 $ do
     WS.get "/" $ do
         current <- liftAndCatchIO $ withConnectionIO (connectSqlite3 "db/database.db3") $ \conn ->
             readLatestMeasurements conn

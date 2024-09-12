@@ -1,10 +1,10 @@
-cabal-version: 3.0
+cabal-version: 2.0
 
 -- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 221e5b155f8c1aefc6b413d28c06cde1175a9f112cd4d77e3784e5158f86abb7
+-- hash: 4f50d1b3b07782842d7855a537df7cb516298d46a26060af76558536a8b9f183
 
 name:           templog-server
 version:        0.1.0.0
@@ -14,7 +14,7 @@ bug-reports:    https://github.com/forestphoenix/templog-server/issues
 author:         Lars Hollenbach
 maintainer:     forestphoenix@mailbox.org
 copyright:      MIT
-license:        MIT
+license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -22,74 +22,99 @@ extra-source-files:
     ChangeLog.md
 
 source-repository head
-    type: git
-    location: https://github.com/forestphoenix/templog-server
-
-
-common templog-common
-    build-depends:
-        base >=4.7 && <5,
-        relude == 1.2.*
-
-    default-language: Haskell2010
-
-    mixins:
-        base hiding (Prelude),
-        relude (Relude as Prelude)
+  type: git
+  location: https://github.com/forestphoenix/templog-server
 
 library
-    import: templog-common
-    exposed-modules:
-        Lib,
-        Measurements
-    other-modules:
-        Paths_templog_server,
-        Database.Record.TH.SQLite3,
-        Database.Relational.Query.SQLite3,
-        Db.Assignment,
-        Db.Measurement,
-        Types.Esp
-    hs-source-dirs:
-        src
-    build-depends:
-        scotty == 0.20.*,
-        blaze-html == 0.9.*,
-        aeson == 2.1.*,
-
-        relational-record == 0.2.*,
-        relational-query,
-        relational-query-HDBC,
-        persistable-record,
-        template-haskell,
-        HDBC,
-        HDBC-session,
-        HDBC-sqlite3,
-
-        time,
-        text
+  exposed-modules:
+      Database.Record.TH.SQLite3
+      Database.Relational.Query.SQLite3
+      Db.Assignment
+      Db.Measurement
+      Lib
+      Measurements
+      Types.Common
+      Types.Esp
+  other-modules:
+      Paths_templog_server
+  hs-source-dirs:
+      src
+  build-depends:
+      HDBC
+    , HDBC-session
+    , HDBC-sqlite3
+    , aeson ==2.1.*
+    , base >=4.7 && <5
+    , blaze-html ==0.9.*
+    , persistable-record
+    , relational-query
+    , relational-query-HDBC
+    , relational-record ==0.2.*
+    , relude ==1.2.*
+    , scotty ==0.20.*
+    , template-haskell
+    , text
+    , time
+  mixins:
+      base hiding (Prelude)
+    , relude (Relude as Prelude)
+  default-language: Haskell2010
 
 executable templog-server-exe
-    import: templog-common
-    main-is: Main.hs
-    other-modules:
-        Paths_templog_server
-    hs-source-dirs:
-        app
-    build-depends:
-        templog-server
-
-    ghc-options: -threaded -rtsopts -optl-pthread -with-rtsopts=-N
+  main-is: Main.hs
+  other-modules:
+      Paths_templog_server
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HDBC
+    , HDBC-session
+    , HDBC-sqlite3
+    , aeson ==2.1.*
+    , base >=4.7 && <5
+    , blaze-html ==0.9.*
+    , persistable-record
+    , relational-query
+    , relational-query-HDBC
+    , relational-record ==0.2.*
+    , relude ==1.2.*
+    , scotty ==0.20.*
+    , template-haskell
+    , templog-server
+    , text
+    , time
+  mixins:
+      base hiding (Prelude)
+    , relude (Relude as Prelude)
+  default-language: Haskell2010
 
 test-suite templog-server-test
-    import: templog-common
-    type: exitcode-stdio-1.0
-    main-is: Spec.hs
-    other-modules:
-        Paths_templog_server
-    hs-source-dirs:
-        test
-    build-depends:
-        templog-server
-
-    ghc-options: -threaded -rtsopts -optl-pthread -with-rtsopts=-N
-
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_templog_server
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HDBC
+    , HDBC-session
+    , HDBC-sqlite3
+    , aeson ==2.1.*
+    , base >=4.7 && <5
+    , blaze-html ==0.9.*
+    , persistable-record
+    , relational-query
+    , relational-query-HDBC
+    , relational-record ==0.2.*
+    , relude ==1.2.*
+    , scotty ==0.20.*
+    , template-haskell
+    , templog-server
+    , text
+    , time
+  mixins:
+      base hiding (Prelude)
+    , relude (Relude as Prelude)
+  default-language: Haskell2010

@@ -20,7 +20,19 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/forestphoenix/templog-server#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+- name: base
+  version: ">= 4.7 && < 5"qqq
+  mixin:
+    - hiding (Prelude)
+- name: relude
+  version: "== 1.2.*"
+  mixin:
+    - (Relude as Prelude)
+- scotty == 0.20.* # TODO: Remove
+- blaze-html == 0.9.*
+- aeson == 2.1.*
+- time
+- text
 
 library:
   source-dirs: src
@@ -35,6 +47,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - templog-server
+    #TODO: Move scotty here.
 
 tests:
   templog-server-test:

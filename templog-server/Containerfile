@@ -9,7 +9,6 @@ RUN apt-get update && \
 # haskell deps
 COPY ./stack.yaml /opt/templog-server/
 COPY ./package.yaml /opt/templog-server/
-COPY ./templog-server.cabal /opt/templog-server/
 
 COPY README.md /opt/templog-server/
 COPY ChangeLog.md /opt/templog-server/
