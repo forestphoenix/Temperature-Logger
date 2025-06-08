@@ -96,6 +96,8 @@ struct TempLoggerEvent
 struct TempLoggerConfig
 {
     uint readingsToTransmit     = 30;
+    float sendOnHumidityDifference = 5.0;
+    float sendOnTemperatureDifference = 1.0;
 };
 
 class TempLoggerSM : public StateMachine<TempLoggerAction, Void, TempLoggerEvent, TempLoggerState>

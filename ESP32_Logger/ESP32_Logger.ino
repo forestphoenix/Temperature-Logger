@@ -13,11 +13,12 @@
 #include <time.h>
 #include <DHTesp.h>
 
+#include <EEPROM.h>
+
 #include <WiFi.h>
 #include <WiFiMulti.h>
-
-#include <HTTPClient.h>
 #include <ESPmDNS.h>
+#include <MqttClient.h>
 
 #include "TempLoggerSM.h"
 #include "TransmitDataSM.h"
@@ -28,10 +29,14 @@ constexpr int dhtPin = 4;
 constexpr int statusLed   = 17;
 constexpr int transmitLed = 18;
 constexpr int errorLed    = 19;
+
+constexpr int eepromOffsetSsid = 0;
+constexpr int eepromOffsetPassword = eepromOffsetSsid + 32;
+
 DHTesp dht;
 
-const char* ssid = "Pressurized_Network";
-const char* password = "1Gerti.Douglas.Richardson";
+const char* fwVersion = "0.1.1";
+const char* mqttTopic = "n ";
 
 WiFiMulti wifiMulti;
 
@@ -49,6 +54,9 @@ RTC_DATA_ATTR TransmitDataSM transmitSM;
 void setup()
 {
     Serial.begin(115200);
+
+    EEPROM.begin(1024);
+    
     delay(1000);
     
     pinMode(statusLed, OUTPUT);
@@ -92,14 +100,71 @@ bool browseService(const char * service, const char * proto, IPAddress *ip, uint
     return found;
 }
 
+void writeWifiConfig(String ssid, String password)
+{
+    // Maximum length of Wifi SSIDs
+    if(ssid.length() > 31)
+    {
+        ssid = ssid.substring(0, 31);
+    }
+    
+    // Maximum length of WPA2 passphrases
+    if(password.length() > 63)
+    {
+        password = password.substring(0, 63);
+    }
+    
+    for(int i = 0; i < 32; i++)
+    {
+        char toWrite = i < ssid.length() ? ssid[i] : '\0';
+        EEPROM.write(eepromOffsetSsid + i, toWrite);
+    }
+    
+    for(int i = 0; i <= 64; i++)
+    {
+        char toWrite = i < password.length() ? password[i] : '\0';
+        EEPROM.write(eepromOffsetPassword + i, toWrite);
+    }
+    EEPROM.commit();
+}
+
+void readWifiConfig(String &ssid, String &password)
+{
+    char bufSsid[32] = {0};
+    char bufPassword[64] = {0};
+    
+    for(int i = 0; i < 31; i++)
+    {
+        bufSsid[i] = EEPROM.read(eepromOffsetSsid + i);
+    }
+    
+    for(int i = 0; i < 63; i++)
+    {
+        bufPassword[i] = EEPROM.read(eepromOffsetPassword + i);
+    }
+    
+    ssid = String(bufSsid);
+    password = String(bufPassword);
+}
+
 TransmitDataEvent runTransmitData(TransmitDataAction const& action)
 {
     switch(action.action)
     {
         case TransmitDataAction::Action::ConnectWifi:
             {
-                Serial.println("TransmitDataAction::Action::ConnectWifi: connecting...");
-                wifiMulti.addAP(ssid, password);
+                String ssid;
+                String password;
+                
+                readWifiConfig(ssid, password);
+                
+                Serial.println("TransmitDataAction::Action::ConnectWifi: connecting to AP: ");
+                Serial.println(ssid);
+                Serial.print("with a password that is ");
+                Serial.print(password.length());
+                Serial.println(" bytes long.");
+                
+                wifiMulti.addAP(ssid.c_str(), password.c_str());
                 
                 bool connected = false;
                 unsigned attempt = 1;
@@ -145,7 +210,7 @@ TransmitDataEvent runTransmitData(TransmitDataAction const& action)
                 
                 IPAddress serviceIp;
                 uint16_t servicePort;
-                if(not browseService("templog-server", "tcp", &serviceIp, &servicePort))
+                if(not browseService("mqtt", "tcp", &serviceIp, &servicePort))
                 {
                     Serial.println("Failed to locate service");
                     return TransmitDataEvent::errorOccurred(ErrorCode::ServiceLookupFailed);
@@ -187,43 +252,43 @@ TransmitDataEvent runTransmitData(TransmitDataAction const& action)
                 
                 // Actual transmission
                 
-                
-                HTTPClient http;
+                WiFiClient wifiClient;
+                MqttClient mqttClient(wifiClient);
+                mqttClient.setId(uniqueId);
     
-                Serial.print("[HTTP] begin... on address ");
+                Serial.print("[MQTT] begin... on address ");
                 IPAddress serviceIp{action.ip4Address};
                 Serial.print(serviceIp.toString());
                 Serial.print(" and port: ");
                 Serial.println(action.port);
-                // configure traged server and url
-                //http.begin("192.168.0.11/a/check", ca); //HTTPS
-                http.begin(serviceIp.toString(), action.port, "/templog/v2/send"); //HTTP
-        
-                Serial.print("[HTTP] POST...\n");
-                // start connection and send HTTP header
-        
-                Serial.print("Sending JSON: ");
-                Serial.println(payload);
                 
-                int httpCode = http.POST(payload);
+                bool connectOk = mqttClient.connect(serviceIp, action.port);
         
                 // httpCode will be negative on error
-                if(httpCode > 0) {
-                    // HTTP header has been send and Server response header has been handled
-                    Serial.printf("[HTTP] POST... code: %d\n", httpCode);
-                    String payload = http.getString();
+                if(connectOk) {
+                    Serial.print("Sending JSON: ");
                     Serial.println(payload);
+
+                    mqttClient.setTxPayloadSize(payload.length());
+                    
+                    bool transmitOK = mqttClient.beginMessage("templog/measurements");
+                    transmitOK = transmitOK && mqttClient.print(payload);
+                    transmitOK = transmitOK && mqttClient.endMessage();
+    
+                    mqttClient.stop();
                     
                     // file found at server
-                    if(httpCode == HTTP_CODE_OK) {
+                    if(transmitOK) 
+                    {
                         return TransmitDataEvent::dataless(TransmitDataEvent::Event::DataTransmitted);
                     }
                     else
                     {
+                        Serial.printf("[MQTT] Transmit failed, error: %d\n", mqttClient.connectError());
                         return TransmitDataEvent::errorOccurred(ErrorCode::TransmitDataFailed);
                     }
                 } else {
-                    Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
+                    Serial.printf("[MQTT] Connect failed, error: %d\n", mqttClient.connectError());
 
                     return TransmitDataEvent::errorOccurred(ErrorCode::TransmitDataFailed);
                 }
@@ -250,19 +315,75 @@ void blinkOutCode(uint32_t code)
     delay(1000);
 }
 
+// This allows the user to see a fresh start by the LEDs, and an assembler to check if all LEDs are connected properly
+void initBlink()
+{
+    digitalWrite(statusLed, LOW);
+    delay(100);
+    digitalWrite(statusLed, HIGH);
+    
+    digitalWrite(transmitLed, HIGH);
+    delay(500);
+    digitalWrite(transmitLed, LOW);
+
+    digitalWrite(errorLed, HIGH);
+    delay(500);
+    digitalWrite(errorLed, LOW);
+}
+
 TempLoggerEvent runTempLogger(TempLoggerAction const& action)
 {
     switch (action.action)
     {
     case TempLoggerAction::Action::Initialize:
         transmitSM.run(TransmitDataEvent::dataless(TransmitDataEvent::Event::FirstStart), &runTransmitData);
+        
+        Serial.print("TempLogger, version=");
+        Serial.println(fwVersion);
+        Serial.println("TempLoggerAction::Action::Initialize: Detecting sensor...");
+        
+        initBlink(); // According to the docs of the DHT-Lib, we may have to wait 1000 ms after auto-detection
+        
+        // Enter wifi Config?
+        if(Serial.available() > 0)
+        {
+            Serial.println("Enter Config parameter (available is: 'Wifi')");
+            
+            String readString = Serial.readStringUntil('\n');
+            if(readString == "Wifi")
+            {
+                Serial.setTimeout(60000);
+                Serial.println("Enter SSID:");
+                String readSsid = Serial.readStringUntil('\n');
+                Serial.println(readSsid);
+                
+                Serial.println("Enter Passphrase:");
+                String readPassword = Serial.readStringUntil('\n');
+                Serial.println(readPassword.length());
+                
+                writeWifiConfig(readSsid, readPassword);
+                
+                Serial.println("Wifi config written to EEPROM.");
+                Serial.setTimeout(1000);
+            }
+        }
+        
+        {
+            String ssid;
+            String password;
+            
+            readWifiConfig(ssid, password);
+            
+            Serial.println("Wifi Configuration read from EEPROM: ");
+            Serial.println(ssid);
+            Serial.print("with a password that is ");
+            Serial.print(password.length());
+            Serial.println(" bytes long.");
+        }
+            
                                                                                     
         if (dhtModel == DHTesp::AUTO_DETECT) // Not initialized before deep sleep
         {
-            Serial.println("TempLoggerAction::Action::Initialize: Detecting sensor...");
-            
-            delay(1000); // According to the docs of the DHT-Lib, we may have to wait 1000 ms after auto-detection
-            
             dht.getTemperature(); // Force at least one sensor read
             if (dht.getStatus() == DHTesp::ERROR_NONE)
             {

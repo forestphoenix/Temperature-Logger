@@ -89,8 +89,18 @@ StateMachine<TempLoggerAction, Void, TempLoggerEvent, TempLoggerState>::Result T
             {
                 state.readings[state.readingsCount] = input.latestReading;
                 state.readingsCount++;
+                
+                bool largeDeviation = false;
+                if(state.readingsCount > 2)
+                {
+                    auto firstReading = state.readings[0];
+                    auto latestReading = state.readings[state.readingsCount - 1];
+                    
+                    largeDeviation = largeDeviation || (latestReading.humidity - firstReading.humidity) > m_config.sendOnHumidityDifference;
+                    largeDeviation = largeDeviation || (latestReading.temperature - firstReading.temperature) > m_config.sendOnTemperatureDifference;
+                }
 
-                if (state.readingsCount >= m_config.readingsToTransmit)
+                if (largeDeviation || state.readingsCount >= m_config.readingsToTransmit)
                 {
                     state.state = TempLoggerState::State::Transmitting;
                     return Result(TempLoggerAction::transmitData(state.readings, state.readingsCount));
@@ -131,4 +141,3 @@ StateMachine<TempLoggerAction, Void, TempLoggerEvent, TempLoggerState>::Result T
 
     return Result(TempLoggerAction::blinkOutError(ErrorCode::StateMismatch, true));
 }
-
