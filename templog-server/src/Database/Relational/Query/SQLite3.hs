@@ -12,6 +12,8 @@ module Database.Relational.Query.SQLite3 (
   , makeRelationalRecord
   ) where
 
+import Relude
+
 import Language.Haskell.TH (Name, Q, Dec)
 
 import Database.HDBC hiding (execute, finish, run)

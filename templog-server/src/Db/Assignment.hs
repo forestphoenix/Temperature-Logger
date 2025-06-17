@@ -8,4 +8,4 @@ module Db.Assignment where
 
 import           Database.Record.TH.SQLite3 (defineTable)
 
-$(defineTable "db/database.db3" "Assignment")
+$(defineTable "db/database.db" "Assignment")

@@ -20,19 +20,25 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/forestphoenix/templog-server#readme>
 
 dependencies:
-- name: base
-  version: ">= 4.7 && < 5"qqq
-  mixin:
-    - hiding (Prelude)
-- name: relude
-  version: "== 1.2.*"
-  mixin:
-    - (Relude as Prelude)
-- scotty == 0.20.* # TODO: Remove
-- blaze-html == 0.9.*
+- base >= 4.7 && < 5
+- relude== 1.2.*
 - aeson == 2.1.*
-- time
+- blaze-html == 0.9.*
+- HDBC
+- HDBC-session
+- HDBC-sqlite3
+- persistable-record
+- relational-query
+- relational-query-HDBC
+- relational-record
+- scotty == 0.20.*
+- template-haskell
 - text
+- time
+- wai
+
+default-extensions:
+- NoImplicitPrelude
 
 library:
   source-dirs: src
@@ -47,7 +53,6 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - templog-server
-    #TODO: Move scotty here.
 
 tests:
   templog-server-test:

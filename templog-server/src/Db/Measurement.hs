@@ -6,6 +6,8 @@
 
 module Db.Measurement where
 
+import Relude
+
 import           Database.Record.TH.SQLite3 (defineTable)
 
-$(defineTable "db/database.db3" "Measurement")
+$(defineTable "db/database.db" "Measurement")

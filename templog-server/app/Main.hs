@@ -1,4 +1,8 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Main where
+
+import           Relude
 
 import           Lib
 

@@ -5,7 +5,8 @@ module Types.Esp (
     CollectedReadings(..),
 ) where
 
-import           Data.Aeson (FromJSON)
+import Relude
+import           Data.Aeson (FromJSON) 
 
 data TemperatureReadout = TemperatureReadout {
     device     :: Text,

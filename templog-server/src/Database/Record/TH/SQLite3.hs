@@ -4,6 +4,8 @@ module Database.Record.TH.SQLite3 (
     defineTable
   ) where
 
+import Relude
+
 import GHC.Generics (Generic)
 import Database.HDBC.Query.TH (defineTableFromDB)
 import Database.HDBC.Schema.Driver (typeMap)

@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MonadComprehensions        #-}
+{-# LANGUAGE MonoLocalBinds             #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedLabels           #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
@@ -11,12 +12,15 @@
 
 module Measurements (
     NewMeasurement(..),
+    LatestMeasurements(..),
+    MeasurementReadout(..),
     takeMeasurements,
     readLatestMeasurements,
 ) where
 
+import Relude
+
 import           Data.Time                                (LocalTime)
-import           Data.Time.Format.ISO8601                 (iso8601Show)
 import           Database.HDBC                            (IConnection, commit,
                                                            withTransaction)
 import           Database.HDBC.Query.TH                   (makeRelationalRecord)
@@ -26,6 +30,7 @@ import           Database.Relational
 import           Database.Relational.Documentation        ((|$|), (|*|))
 import           Database.Relational.OverloadedInstances
 import           Database.Relational.OverloadedProjection
+
 
 import           Db.Measurement
 
