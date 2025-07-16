@@ -25,12 +25,14 @@ source-repository head
 
 library
   exposed-modules:
+      Config
       Database.Record.TH.SQLite3
       Database.Relational.Query.SQLite3
       Db.Assignment
       Db.Measurement
       Lib
       Measurements
+      Mqtt
       Types.Common
       Types.Esp
       Views.Overview
@@ -40,6 +42,7 @@ library
       src
   default-extensions:
       NoImplicitPrelude
+      StrictData
   build-depends:
       HDBC
     , HDBC-session
@@ -47,6 +50,8 @@ library
     , aeson ==2.1.*
     , base >=4.7 && <5
     , blaze-html ==0.9.*
+    , net-mqtt ==0.8.*
+    , network-uri
     , persistable-record
     , relational-query
     , relational-query-HDBC
@@ -67,6 +72,7 @@ executable templog-server-exe
       app
   default-extensions:
       NoImplicitPrelude
+      StrictData
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC
@@ -75,6 +81,8 @@ executable templog-server-exe
     , aeson ==2.1.*
     , base >=4.7 && <5
     , blaze-html ==0.9.*
+    , net-mqtt ==0.8.*
+    , network-uri
     , persistable-record
     , relational-query
     , relational-query-HDBC
@@ -97,6 +105,7 @@ test-suite templog-server-test
       test
   default-extensions:
       NoImplicitPrelude
+      StrictData
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC
@@ -105,6 +114,8 @@ test-suite templog-server-test
     , aeson ==2.1.*
     , base >=4.7 && <5
     , blaze-html ==0.9.*
+    , net-mqtt ==0.8.*
+    , network-uri
     , persistable-record
     , relational-query
     , relational-query-HDBC

@@ -16,11 +16,19 @@ module Measurements (
     MeasurementReadout(..),
     takeMeasurements,
     readLatestMeasurements,
+    recordTemperature,
+    convertMeasurements,
 ) where
 
 import Relude
 
-import           Data.Time                                (LocalTime)
+import qualified Types.Esp
+import           Data.Semigroup                           (Max (..), getMax)
+import           Data.Text                                (unpack)
+import           Data.Time                                (LocalTime,
+                                                           ZonedTime (zonedTimeToLocalTime),
+                                                           addLocalTime, getZonedTime,
+                                                           secondsToNominalDiffTime)
 import           Database.HDBC                            (IConnection, commit,
                                                            withTransaction)
 import           Database.HDBC.Query.TH                   (makeRelationalRecord)
@@ -71,10 +79,10 @@ data MeasurementReadout = MeasurementReadout {
 
 readLatestMeasurements :: (IConnection conn) => conn -> IO LatestMeasurements
 readLatestMeasurements conn =
-    convertMeasurements <$> runQuery' conn (relationalQuery latestMeasurements) ()
+    convertDbMeasurements <$> runQuery' conn (relationalQuery latestMeasurements) ()
 
-convertMeasurements :: [Measurement] -> LatestMeasurements
-convertMeasurements measurements =
+convertDbMeasurements :: [Measurement] -> LatestMeasurements
+convertDbMeasurements measurements =
     LatestMeasurements $ fromList (convMeasurement <$> measurements)
         where
             convMeasurement m = (device m, MeasurementReadout {
@@ -97,3 +105,23 @@ sndOfTuple = decodeProjection
 
 decodeProjection :: (PersistableWidth a, PersistableWidth b, HasProjection "snd" (a, b) b) => Record c (a, b) -> Record c b
 decodeProjection r = #snd r
+
+-- | Record temperature readings in the database
+recordTemperature :: (IConnection conn) => conn -> Types.Esp.CollectedReadings -> IO ()
+recordTemperature conn readings = do
+    zonedTime <- getZonedTime
+    let localTime = zonedTimeToLocalTime zonedTime
+    takeMeasurements conn $ convertMeasurements readings localTime
+
+-- | Convert ESP temperature readings to database measurements
+convertMeasurements :: Types.Esp.CollectedReadings -> LocalTime -> [NewMeasurement]
+convertMeasurements (Types.Esp.CollectedReadings rawReadings) timeReceived = convertSingle <$> rawReadings
+    where
+        convertSingle measurement = NewMeasurement
+            (unpack $ Types.Esp.device measurement)
+            (Types.Esp.temp measurement)
+            (Types.Esp.humidity measurement)
+            (convertTime $ Types.Esp.deviceTime measurement)
+        convertTime deviceTime = addLocalTime
+            (secondsToNominalDiffTime $ fromInteger $ toInteger $ deviceTime - lastTimeStamp) timeReceived
+        lastTimeStamp = getMax $ mconcat $ Max <$> Types.Esp.deviceTime <$> rawReadings

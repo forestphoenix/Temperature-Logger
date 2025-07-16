@@ -16,7 +16,7 @@ data TemperatureReadout = TemperatureReadout {
 } deriving (Generic, Show)
 instance FromJSON TemperatureReadout
 
-data CollectedReadings = CollectedReadings [TemperatureReadout]
+newtype CollectedReadings = CollectedReadings [TemperatureReadout]
     deriving (Generic, Show)
 instance FromJSON CollectedReadings
 

@@ -27,6 +27,8 @@ dependencies:
 - HDBC
 - HDBC-session
 - HDBC-sqlite3
+- net-mqtt == 0.8.*
+- network-uri
 - persistable-record
 - relational-query
 - relational-query-HDBC
@@ -39,6 +41,7 @@ dependencies:
 
 default-extensions:
 - NoImplicitPrelude
+- StrictData
 
 library:
   source-dirs: src
